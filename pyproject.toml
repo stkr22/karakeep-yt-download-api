@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "karakeep-yt-download-api"
-version = "0.1.0"
+version = "0.2.0"
 description = "Webhook sidecar that downloads YouTube bookmarks from Karakeep into a Jellyfin library."
 authors = [
     { name = "stkr22", email = "stkr22@github.com" }
