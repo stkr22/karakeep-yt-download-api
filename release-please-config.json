@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "python",
+      "extra-files": [
+        {
+          "type": "toml",
+          "path": "uv.lock",
+          "jsonpath": "$.package[?(@.name.value=='karakeep-yt-download-api')].version"
+        },
+        {
+          "type": "yaml",
+          "path": "charts/karakeep-yt-download-api/values.yaml",
+          "jsonpath": "$['app-template'].controllers.main.containers.main.image.tag"
+        }
+      ]
+    }
+  }
+}

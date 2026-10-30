@@ -1,0 +1,89 @@
+name: Python Code Quality
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Install uv
+        # Version unset on purpose: setup-uv reads required-version from
+        # pyproject.toml ([tool.uv]), the single source of truth.
+        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+
+      - name: Set up Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Run Ruff
+        run: uv run ruff check --output-format=github .
+
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Install uv
+        # Version unset on purpose: setup-uv reads required-version from
+        # pyproject.toml ([tool.uv]), the single source of truth.
+        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+
+      - name: Set up Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Run ty (Type Checker)
+        run: uv run ty check
+
+
+  chart-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Lint and render chart
+        run: |
+          helm dependency update charts/karakeep-yt-download-api
+          helm lint charts/karakeep-yt-download-api
+          helm template karakeep-yt-download-api charts/karakeep-yt-download-api > /dev/null
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+
+      - name: Install uv
+        # Version unset on purpose: setup-uv reads required-version from
+        # pyproject.toml ([tool.uv]), the single source of truth.
+        uses: astral-sh/setup-uv@ed21f2f24f8dd64503750218de024bcf64c7250a # v7.1.5
+
+      - name: Set up Python
+        uses: actions/setup-python@83679a892e2d95755f2dac6acb0bfd1e9ac5d548 # v6
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install the project
+        run: uv sync --all-extras --dev
+
+      - name: Run Pytest
+        # testpaths (tests/) and the default flags come from
+        # [tool.pytest.ini_options] in pyproject.toml.
+        run: uv run pytest --cov=karakeep_yt_download_api --cov-report=xml --cov-report=term

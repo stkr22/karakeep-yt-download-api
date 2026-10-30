@@ -1,0 +1,65 @@
+# Values are passed to the bjw-s app-template subchart (see Chart.yaml).
+app-template:
+  defaultPodOptions:
+    securityContext:
+      runAsUser: 1001
+      runAsGroup: 1001
+      fsGroup: 1001
+      fsGroupChangePolicy: OnRootMismatch
+  controllers:
+    main:
+      containers:
+        main:
+          image:
+            repository: ghcr.io/stkr22/karakeep-yt-download-api
+            tag: "0.1.0"  # bumped by release-please
+          env:
+            KYT_LIBRARY_PATH: /library
+            KYT_JELLYFIN_URL: https://jellyfin.example.lan
+            KYT_JELLYFIN_LIBRARY_ID: ""  # CHANGE ME: item id of the YouTube library
+            KYT_YTDLP_FORMAT: bestvideo*+bestaudio/best
+            KYT_YTDLP_MERGE_FORMAT: mkv
+            KYT_CHANNEL_FOLDERS: "true"  # "false" stores videos flat in the library root
+            # Provide KYT_WEBHOOK_TOKEN and KYT_JELLYFIN_API_KEY from an existing secret:
+            KYT_WEBHOOK_TOKEN:
+              valueFrom:
+                secretKeyRef:
+                  name: karakeep-yt-download-api
+                  key: webhook-token
+            KYT_JELLYFIN_API_KEY:
+              valueFrom:
+                secretKeyRef:
+                  name: karakeep-yt-download-api
+                  key: jellyfin-api-key
+          probes:
+            liveness: &probe
+              enabled: true
+              custom: true
+              spec:
+                httpGet:
+                  path: /healthz
+                  port: 8000
+            readiness: *probe
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [ALL]
+  service:
+    main:
+      controller: main
+      ports:
+        http:
+          port: 8000
+  persistence:
+    library:
+      type: nfs
+      server: nfs.example.lan          # CHANGE ME: NFS server
+      path: /export/media/youtube      # CHANGE ME: export/subfolder of the Jellyfin YouTube library
+      globalMounts:
+        - path: /library
+    tmp:
+      type: emptyDir
+      globalMounts:
+        - path: /tmp
+    # Optional cookies for age-gated videos: mount a secret and set KYT_YTDLP_COOKIES_FILE.
