@@ -11,7 +11,7 @@ app-template:
         main:
           image:
             repository: ghcr.io/stkr22/karakeep-yt-download-api
-            tag: 0.2.0
+            tag: 0.2.0@sha256:0f2125e13e758e06bd337f06ce4d6f3167148544611b5f1f07fae52d527904c3
           env:
             KYT_LIBRARY_PATH: /library
             KYT_JELLYFIN_URL: https://jellyfin.example.lan
