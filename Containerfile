@@ -24,7 +24,7 @@ RUN --mount=type=cache,target=/root/.cache \
     uv sync --locked --no-dev
 
 # Runtime stage: Python 3.14.7-slim-trixie
-FROM docker.io/library/python:3.14.7-slim-trixie@sha256:ce40764625a4ff50df3548277632e7f96c4e77fe75fa848aae9885476e7df5a4
+FROM docker.io/library/python:3.14.7-slim-trixie@sha256:51dafde81dbdb6ebde285137a295cf18a47ca95234fe388a343719cb97305b3d
 
 ENV PYTHONUNBUFFERED=1
 
